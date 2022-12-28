@@ -18,6 +18,7 @@ install_dir/
 .*.dep
 /*.log
 cscope.*
+compile_commands.json
 
 #
 # Debugging files
