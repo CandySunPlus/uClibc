@@ -1,0 +1,2 @@
+CompileFlags:
+    Remove: [-fno-tree-loop-optimize, -fno-tree-dominator-opts, -mno-split-addresses]

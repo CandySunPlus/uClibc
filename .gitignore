@@ -19,6 +19,7 @@ install_dir/
 /*.log
 cscope.*
 compile_commands.json
+.cache
 
 #
 # Debugging files
