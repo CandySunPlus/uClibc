@@ -3653,11 +3653,11 @@ res_init(void)
 	 */
 	if (!_res.id)
 		_res.id = res_randomid();
-	__res_sync = res_sync_func;
 
 	__UCLIBC_MUTEX_UNLOCK(__resolv_lock);
 
 	__res_vinit(&_res, 1);
+	__res_sync = res_sync_func;
 
 	return 0;
 }
@@ -3740,11 +3740,10 @@ int res_query(const char *dname, int class, int type,
 
 	free(a.dotted);
 
-	if (a.atype == type) { /* CNAME */
-		if (i > anslen)
-			i = anslen;
-		memcpy(answer, packet, i);
-	}
+	if (i > anslen)
+		i = anslen;
+	memcpy(answer, packet, i);
+
 	free(packet);
 	return i;
 }
