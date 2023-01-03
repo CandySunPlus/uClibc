@@ -24,7 +24,7 @@ libpthread-routines-$(UCLIBC_SUSV4_LEGACY) += pthread_getconcurrency.c \
 	pthread_setconcurrency
 
 libpthread-compat_CSRC = pthread_setname.c pthread_getname.c
-libpthread-compat_COMM_CSRC = cancellation.c cleanup_compat.c pthread_mutex_unlock.c unwind.c vars.c
+libpthread-compat_COMM_CSRC = 
 
 libpthread_CSRC = $(filter-out $(libpthread-routines-) \
 		  		$(libc-shared-routines-y) \

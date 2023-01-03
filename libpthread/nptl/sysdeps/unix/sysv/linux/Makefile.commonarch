@@ -97,8 +97,6 @@ endif
 libpthread-a-y += $(if $(DOPIC),$(libpthread_linux_OBJS:.o=.os),$(libpthread_linux_OBJS))
 libpthread-so-y += $(libpthread_linux_OBJS:.o=.oS)
 libpthread-so-y += $(libpthread_linux_OUT)/pt-raise.oS
-libpthread-compat-so-y += $(libpthread_linux_OBJS:.o=.oS)
-libpthread-compat-so-y += $(libpthread_linux_OUT)/pt-raise.oS
 #libpthread-nomulti-y += $(libpthread_linux_OBJS)
 
 libc_linux_OBJS := $(libc_linux_arch_OBJS)
