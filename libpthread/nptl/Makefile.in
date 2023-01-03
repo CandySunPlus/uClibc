@@ -22,17 +22,25 @@ libpthread-routines- += pthread_mutex_getprioceiling.c pthread_mutex_setprioceil
 libpthread-routines-$(UCLIBC_HAS_RESOLVER_SUPPORT) += res.c
 libpthread-routines-$(UCLIBC_SUSV4_LEGACY) += pthread_getconcurrency.c \
 	pthread_setconcurrency
+
+libpthread-compat_CSRC = pthread_setname.c pthread_getname.c
+libpthread-compat_COMM_CSRC = cancellation.c cleanup_compat.c pthread_mutex_unlock.c unwind.c vars.c
+
 libpthread_CSRC = $(filter-out $(libpthread-routines-) \
 		  		$(libc-shared-routines-y) \
 		  		$(libc-static-routines-y) \
 				$(libpthread-shared-only-routines-y) \
 				$(libpthread-static-only-routines-y) \
+				$(libpthread-compat_CSRC) \
 				$(notdir $(libpthread_OBJS:.o=.c)), \
 		  $(notdir $(wildcard $(libpthread_DIR)/*.c)))
 
 libpthread_OBJS += $(addprefix $(libpthread_OUT)/,$(libpthread_CSRC:.c=.o))
 libpthread-so-y += $(addprefix $(libpthread_OUT)/,$(libpthread-shared-only-routines-y:.c=.oS))
 libpthread-so-y += $(libpthread_OBJS:.o=.oS)
+libpthread-compat_OBJS += $(addprefix $(libpthread_OUT)/,$(libpthread-compat_CSRC:.c=.o))
+libpthread-compat_OBJS += $(addprefix $(libpthread_OUT)/,$(libpthread-compat_COMM_CSRC:.c=.o))
+libpthread-compat-so-y += $(libpthread-compat_OBJS:.o=.oS)
 libpthread-nonshared-y := $(addprefix $(libpthread_OUT)/,$(libpthread-static-only-routines-y:.c=.oS))
 libpthread-static-y    := $(addprefix $(libpthread_OUT)/,$(libpthread-static-only-routines-y:.c=.o))
 libpthread-static-y    += $(libpthread_OBJS)
@@ -71,8 +79,10 @@ $(top_builddir)lib/libpthread.so: | $(START_FILE-libpthread.so) $(END_FILE-libpt
 endif
 
 libpthread_FULL_NAME := libpthread-$(VERSION).so
+libpthread-compat_FULL_NAME := libpthread-compat-$(VERSION).so
 lib-a-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread.a
 lib-so-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread.so
+lib-so-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread-compat.so
 
 $(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread_so.a $(libc.depend) $(libdl.depend) $(top_builddir)lib/libpthread_nonshared.a
 	$(call link.so,$(libpthread_FULL_NAME),$(ABI_VERSION))
@@ -80,10 +90,20 @@ $(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread_so.a $(libc.depen
 	$(Q)echo "GROUP ( $(notdir $@).$(ABI_VERSION) libpthread_nonshared.a )" >> $@.tmp
 	$(Q)mv $@.tmp $@
 
+$(top_builddir)lib/libpthread-compat.so: $(libpthread_OUT)/libpthread-compat_so.a $(libc.depend) $(libdl.depend)
+	$(call link.so,$(libpthread-compat_FULL_NAME),$(ABI_VERSION))
+	$(Q)cat $(top_srcdir)extra/scripts/format.lds > $@.tmp
+	$(Q)echo "GROUP ( $(notdir $@).$(ABI_VERSION) )" >> $@.tmp
+	$(Q)mv $@.tmp $@
+
 ifeq ($(PTHREADS_DEBUG_SUPPORT),y)
 $(libpthread_OUT)/libpthread_so.a: STRIP_FLAGS:=$(STRIP_FLAGS:-x=-X --strip-debug)
 endif
 $(libpthread_OUT)/libpthread_so.a: $(libpthread-so-y)
+	$(Q)$(RM) $@
+	$(do_ar)
+
+$(libpthread_OUT)/libpthread-compat_so.a: $(libpthread-compat-so-y)
 	$(Q)$(RM) $@
 	$(do_ar)
 
@@ -142,12 +162,17 @@ ifeq ($(PTHREADS_DEBUG_SUPPORT),y)
 LDFLAGS-libpthread.so += $(LDFLAGS_NOSTRIP) -Wl,-z,defs
 else
 LDFLAGS-libpthread.so += $(LDFLAGS)
+LDFLAGS-libpthread-compat.so += $(LDFLAGS)
 endif
 
 LDFLAGS-libpthread.so += $(top_builddir)lib/$(UCLIBC_LDSO_NAME)-$(VERSION).so $(top_builddir)lib/libdl-$(VERSION).so \
 	-Wl,-z,nodelete,-z,initfirst,-init=$(SYMBOL_PREFIX)__pthread_initialize_minimal_internal
 
+LDFLAGS-libpthread-compat.so += $(top_builddir)lib/$(UCLIBC_LDSO_NAME)-$(VERSION).so $(top_builddir)lib/libdl-$(VERSION).so \
+	-Wl,-z,nodelete,-z,initfirst,-init=$(SYMBOL_PREFIX)__pthread_initialize_minimal_internal
+
 LIBS-libpthread.so := $(LIBS)
+LIBS-libpthread-compat.so := $(LIBS)
 
 CFLAGS-nptl = -DNOT_IN_libc -DIS_IN_libpthread $(SSP_ALL_CFLAGS)
 

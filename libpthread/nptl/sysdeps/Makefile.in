@@ -22,8 +22,10 @@ libpthread_arch_OBJS := $(filter-out $(call base_and_arch_and_subarch,$(libpthre
 include $(libpthread_DIR)/sysdeps/pthread/Makefile.in
 libpthread_pthread_CSRC := $(filter-out $(notdir $(libpthread_linux_OBJS:.o=.c) $(libpthread_arch_OBJS:.o=.c)),$(libpthread_pthread_CSRC))
 libpthread-so-y := $(filter-out $(call base_and_arch_and_subarch,$(libpthread_pthread_OUT),$(libpthread_linux_OBJS) $(libpthread_arch_OBJS)),$(libpthread-so-y))
+libpthread-compat-so-y := $(filter-out $(call base_and_arch_and_subarch,$(libpthread_pthread_OUT),$(libpthread_linux_OBJS) $(libpthread_arch_OBJS)),$(libpthread-compat-so-y))
 
 libpthread_OBJS := $(libpthread_linux_OBJS) $(libpthread_arch_OBJS) $(libpthread_pthread_COBJ)
+libpthread-compat_OBJS := $(libpthread_linux_OBJS) $(libpthread_arch_OBJS) $(libpthread_pthread_COBJ)
 libpthread_libc_OBJS = $(libc_linux_OBJS) $(libc_arch_OBJS)
 libpthread_libc_a_OBJS = $(libc_arch_a_OBJS) $(libpthread_generic_libc_a_OBJS)
 libpthread_librt_OBJS = $(librt_linux_OBJS) $(librt_arch_OBJS)
