@@ -90,7 +90,7 @@ $(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread_so.a $(libc.depen
 	$(Q)echo "GROUP ( $(notdir $@).$(ABI_VERSION) libpthread_nonshared.a )" >> $@.tmp
 	$(Q)mv $@.tmp $@
 
-$(top_builddir)lib/libpthread-compat.so: $(libpthread_OUT)/libpthread-compat_so.a $(libc.depend) $(libdl.depend)
+$(top_builddir)lib/libpthread-compat.so: $(libpthread_OUT)/libpthread-compat_so.a $(libc.depend)
 	$(call link.so,$(libpthread-compat_FULL_NAME),$(ABI_VERSION))
 	$(Q)cat $(top_srcdir)extra/scripts/format.lds > $@.tmp
 	$(Q)echo "GROUP ( $(notdir $@).$(ABI_VERSION) )" >> $@.tmp
