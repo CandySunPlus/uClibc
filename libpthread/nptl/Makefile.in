@@ -168,11 +168,12 @@ endif
 LDFLAGS-libpthread.so += $(top_builddir)lib/$(UCLIBC_LDSO_NAME)-$(VERSION).so $(top_builddir)lib/libdl-$(VERSION).so \
 	-Wl,-z,nodelete,-z,initfirst,-init=$(SYMBOL_PREFIX)__pthread_initialize_minimal_internal
 
-LDFLAGS-libpthread-compat.so += $(top_builddir)lib/$(UCLIBC_LDSO_NAME)-$(VERSION).so $(top_builddir)lib/libdl-$(VERSION).so \
-	-Wl,-z,nodelete,-z,initfirst,-init=$(SYMBOL_PREFIX)__pthread_initialize_minimal_internal
+LDFLAGS-libpthread-compat.so += $(top_builddir)lib/$(UCLIBC_LDSO_NAME)-$(VERSION).so -Wl,-z,nodelete
 
 LIBS-libpthread.so := $(LIBS)
 LIBS-libpthread-compat.so := $(LIBS)
+
+$(info ===============$(LDFLAGS-libpthread-compat.so)===============$(LIBS-libpthread-compat.so))
 
 CFLAGS-nptl = -DNOT_IN_libc -DIS_IN_libpthread $(SSP_ALL_CFLAGS)
 
