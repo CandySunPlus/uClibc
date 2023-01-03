@@ -46,8 +46,10 @@ libpthread-static-y    := $(addprefix $(libpthread_OUT)/,$(libpthread-static-onl
 libpthread-static-y    += $(libpthread_OBJS)
 ifeq ($(DOPIC),y)
 libpthread-a-y := $(libpthread-static-y:.o=.os)
+libpthread-compat-a-y := $(libpthread-compat_OBJS:.o=.os)
 else
 libpthread-a-y := $(libpthread-static-y)
+libpthread-compat-a-y := $(libpthread-compat_OBJS)
 endif
 
 libc-shared-routines-y := $(filter-out $(notdir $(libpthread_libc_OBJS:.o=.c)), $(libc-shared-routines-y))
@@ -81,6 +83,7 @@ endif
 libpthread_FULL_NAME := libpthread-$(VERSION).so
 libpthread-compat_FULL_NAME := libpthread-compat-$(VERSION).so
 lib-a-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread.a
+lib-a-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread-compat.a
 lib-so-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread.so
 lib-so-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread-compat.so
 
@@ -98,12 +101,18 @@ $(top_builddir)lib/libpthread-compat.so: $(libpthread_OUT)/libpthread-compat_so.
 
 ifeq ($(PTHREADS_DEBUG_SUPPORT),y)
 $(libpthread_OUT)/libpthread_so.a: STRIP_FLAGS:=$(STRIP_FLAGS:-x=-X --strip-debug)
+$(libpthread_OUT)/libpthread-compat_so.a: STRIP_FLAGS:=$(STRIP_FLAGS:-x=-X --strip-debug)
 endif
 $(libpthread_OUT)/libpthread_so.a: $(libpthread-so-y)
 	$(Q)$(RM) $@
 	$(do_ar)
 
 $(libpthread_OUT)/libpthread-compat_so.a: $(libpthread-compat-so-y)
+	$(Q)$(RM) $@
+	$(do_ar)
+
+$(top_builddir)lib/libpthread-compat.a: $(libpthread-compat-a-y)
+	$(Q)$(INSTALL) -d $(dir $@)
 	$(Q)$(RM) $@
 	$(do_ar)
 
@@ -160,6 +169,7 @@ CLEAN_libpthread/nptl:
 
 ifeq ($(PTHREADS_DEBUG_SUPPORT),y)
 LDFLAGS-libpthread.so += $(LDFLAGS_NOSTRIP) -Wl,-z,defs
+LDFLAGS-libpthread-compat.so += $(LDFLAGS_NOSTRIP) -Wl,-z,defs
 else
 LDFLAGS-libpthread.so += $(LDFLAGS)
 LDFLAGS-libpthread-compat.so += $(LDFLAGS)
