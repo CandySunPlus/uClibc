@@ -173,8 +173,6 @@ LDFLAGS-libpthread-compat.so += $(top_builddir)lib/$(UCLIBC_LDSO_NAME)-$(VERSION
 LIBS-libpthread.so := $(LIBS)
 LIBS-libpthread-compat.so := $(LIBS)
 
-$(info ===============$(LDFLAGS-libpthread-compat.so)===============$(LIBS-libpthread-compat.so))
-
 CFLAGS-nptl = -DNOT_IN_libc -DIS_IN_libpthread $(SSP_ALL_CFLAGS)
 
 # Since cancellation handling is in large parts handled using exceptions
